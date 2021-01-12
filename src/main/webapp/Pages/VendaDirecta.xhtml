@@ -1,0 +1,314 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="/WEB-INF/templates/Layout.xhtml">
+
+    <ui:define name="content">
+
+        <h1 class="aw-page-title">Venda Directa</h1>
+
+        <p:messages id="messages" showDetail="true" closable="true">
+            <p:autoUpdate />
+        </p:messages>
+
+        <div class="ui-fluid">
+            <p:tabView id="tabView" >                                    
+                <p:tab title="Venda Directa">                    
+                    <h:form id="frm">
+
+                        <!-- PAINEL DOS PRODUTOS E QUANTIDADES -->
+                        <h:panelGrid columns="2" cellspacing="5px">
+
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:outputLabel value="Produto:" style="font-size: large" />
+                                <p:inputText id="prodLable" style="font-size: 3em"  ondblclick="PF('produtoDialog').show()"
+                                             value="#{vendaController.novoProdutoVenda.produtoIdproduto.designacao1}"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="2" width="55%" cellspacing="10px">
+                                <h:panelGrid columns="1" >
+                                    <p:outputLabel value="Qtd:" style="font-size: large"/>
+                                    <p:spinner id="qtd" style="font-size: 1.5em;" value="#{vendaController.quantidade}"
+                                               min="1"/>
+                                </h:panelGrid>
+
+                                <p:commandButton value="Add" style="font-size: 2em; margin-top: 15px" 
+                                                 action="#{vendaController.adicionarProdutoVenda()}" update="qtd, prodLable, produtoTable, precoUnLable, finalizarBt,cancelarBt
+                                                 ,totalLable"/>     
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+
+                        <!-- CHECK BOX ADICIONAR A MESA -->
+                        <h:panelGrid columns="2" style="margin: 1.2em 0; vertical-align: central" >
+                            <p:selectBooleanCheckbox  itemLabel="Adicionar à Mesa" value="#{vendaController.adicionaMesa}" disabled="#{vendaController.desabilitaCheckBox}">
+                                <p:ajax update="NumMesaCombo,finalizarBt" process="@this" />
+                            </p:selectBooleanCheckbox>
+                            <p:selectOneMenu id="NumMesaCombo" disabled="#{not vendaController.adicionaMesa}" value="#{vendaController.mesaNumero}" converter="omnifaces.SelectItemsConverter">
+                                <f:selectItem noSelectionOption="true" itemLabel="Mesa Número"/>
+                                <f:selectItems value="#{vendaPorMesaController.listaDeMesas}" var="mesa" itemValue="#{mesa}" itemLabel="#{mesa.numeroMesa}"/>
+                                <p:ajax event="change" process="NumMesaCombo"/>
+                            </p:selectOneMenu>                            
+                        </h:panelGrid>
+
+                        <!-- TABELA DE PRODUTOS -->                        
+                        <p:dataTable id="produtoTable" var="itens" value="#{vendaController.listaDosItensVenda}" 
+                                     scrollRows="10" scrollable="true" scrollHeight="250" styleClass="tabelaLargura">
+
+                            <p:column headerText="descricao">
+                                <h:outputText value="#{itens.produtoStockidprodutoStock.produtoIdproduto.designacao1}" />
+                            </p:column>
+
+                            <p:column headerText="Qtd" width="15%">
+                                <h:outputText value="#{itens.quantidade}" />
+                            </p:column>
+
+                            <p:column headerText="Preco Un" width="20%">
+                                <h:outputText value="#{itens.produtoStockidprodutoStock.precoVenda}">
+                                    <f:convertNumber  pattern="#,##0.00 KZ" />
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column headerText="Total" width="20%">
+                                <h:outputText  value="#{itens.quantidade * itens.produtoStockidprodutoStock.precoVenda}">
+                                    <f:convertNumber  pattern="#,##0.00 KZ" />
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+
+                        <!-- PAINEL DOS PREÇOS -->
+                        <h:panelGrid columns="3" width="56%">
+
+                            <h:panelGrid columns="1" styleClass="painelPrecos">
+                                <p:outputLabel value="Preço Un:" style="font-size: 1em;"/>
+                                <p:outputLabel id="precoUnLable" value="#{vendaController.precoUn}"  style="font-size: 2em;" >
+                                    <f:convertNumber  pattern="#,##0.00 KZ" />
+                                </p:outputLabel>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1" styleClass="painelPrecos">
+                                <p:outputLabel value="Sub Total:" style="font-size: 1em;"/>
+                                <p:outputLabel value="#{vendaController.subTotal}"  style="font-size: 2em;" >
+                                    <f:convertNumber  pattern="#,##0.00 KZ" />
+                                </p:outputLabel>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1" styleClass="painelPrecos" style="text-align: right">
+                                <p:outputLabel value="Total Geral:" style="font-size: 1em; font-weight: bold"/>
+                                <p:outputLabel id="totalLable" value="#{vendaController.totalGeral}"  style="font-size: 2em"  >
+                                    <f:convertNumber  pattern="#,##0.00 KZ" />
+                                </p:outputLabel>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+
+
+                        <p:separator style="margin: 10px 10px; width: 55%" />
+
+                        <!-- FINALIZAÇÃO DA VENDA -->
+                        <h:panelGrid columns="2" styleClass="tabelaLargura">                   
+                            <p:commandButton id="cancelarBt" value="Cancelar" style="height: 3em; background: #FF6A51; color: #ffffff; width: 27em" 
+                                             icon="fa fa-chevron-circle-right" iconPos="right" action="#{vendaController.cancelarVenda()}"
+                                             update="tabView" process="@this"
+                                             disabled="#{empty vendaController.listaDosItensVenda}"/>
+
+                            <p:commandButton id="finalizarBt" value="Finalizar" style="height: 3em; background: #0081c2; color: #ffffff; width: 27em" 
+                                             icon="fa fa-chevron-circle-left" oncomplete="#{vendaController.mostrarDialog()}" process="@this"
+                                             disabled="#{empty vendaController.listaDosItensVenda}" 
+                                             update="finalizarDialog,addProdMesaDialog,finalizaFrm:totalLable2"/>  
+
+                        </h:panelGrid>
+
+                    </h:form>
+                </p:tab>
+
+                <!-- VISTA DE MESA -->
+                <p:tab title="Vista de Mesas">
+                    <h:form id="frm1">
+                        <p:dataGrid var="mesas" value="#{vendaController.listaDeMesas}" columns="3" layout="grid"
+                                    rows="6" id="mesaGrid">
+
+                            <f:facet name="header">
+                                Venda Por Mesas
+                            </f:facet>
+
+                            <p:panel header=" MESA Nº #{mesas.numeroMesa}" style="text-align:center">
+                                <h:panelGrid id="mesaPanelGrid" columns="1" style="width:100%">
+
+                                    <f:facet name="header">
+                                        <p:graphicImage name="simples/images/#{mesas.imagemMesa()}" />
+                                    </f:facet>
+
+                                    <h:outputText value="#{mesas.contaMesa}" >
+                                        <f:convertNumber  pattern="#,##0.00 KZ" />
+                                    </h:outputText>
+
+                                    <h:panelGrid columns="2" style="width: 100%">
+
+                                        <h:panelGrid columns="1">
+
+                                            <p:commandLink  title="View Detail">
+                                                <i class="fa  fa-fw fa-plus-circle" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{vendaController.mesaSelecionada}" />
+                                            </p:commandLink>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" style="margin-left: 80%" cellspacing="10px">
+
+                                            <p:commandLink   title="Imprimir Conta">
+                                                <i class="fa  fa-fw fa-print" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{vendaController.mesaSelecionada}" />
+                                            </p:commandLink>
+
+                                            <p:commandLink  title="Finalizar Conta" update="tabView" action="#{vendaController.fecharContaMesa()}" immediate="true" process="@this">
+                                                <i class="fa  fa-fw fa-money" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{vendaController.mesaSelecionada}" />
+                                                <p:confirm header="Terminar Conta" message="Pretende Fechar a Conta da Mesa nº #{mesas.numeroMesa}?" icon="pi pi-exclamation-triangle" />
+                                            </p:commandLink>
+                                        </h:panelGrid>
+
+
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                    </h:form>
+                </p:tab>
+
+            </p:tabView>
+
+            <p:dialog id="produtoDialog" widgetVar="produtoDialog" header="Adicionar Produto" modal="true" width="65%" resizable="false">
+                <h:form>
+                    <p:dataTable var="produto" value="#{vendaController.listaDosProdutos}">
+
+                        <p:column headerText="descricao">
+                            <h:outputText  value="#{produto.produtoIdproduto.designacao1}"/>
+                        </p:column>
+
+                        <p:column headerText="Preco">
+                            <h:outputText value="#{produto.precoVenda}"/>
+                        </p:column>
+
+                        <p:column headerText="Stock">
+                            <h:outputText value="#{produto.quantidade}- #{produto.localizacaoIdlocalizacao.designacaoLocal}"/>
+                        </p:column>
+
+                        <p:column style="width:32px;text-align: center">
+                            <p:commandButton icon="ui-icon-circle-plus" update="tabView:frm:prodLable,tabView:frm:precoUnLable" oncomplete="PF('produtoDialog').hide()" process="@this">
+                                <f:setPropertyActionListener value="#{produto}" target="#{vendaController.novoProdutoVenda}"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="finalizarDialog" widgetVar="finalizarDialog" header="Finalizar Venda" modal="true" width="35%" resizable="false">
+                <h:form id="finalizaFrm">
+
+
+                    <h:panelGrid columns="1" style="text-align: right" width="100%">
+                        <p:outputLabel id="totalLable2" value="#{vendaController.totalGeral}"  style="font-size: 2em"  >
+                            <f:convertNumber  pattern="#,##0.00 KZ" />
+                        </p:outputLabel>
+                    </h:panelGrid>
+
+
+                    <p:fieldset legend="Forma de Pagamento">
+                        <p:selectOneRadio id="pagamentoRadio" value="#{vendaController.pagamentoForma}" converter="omnifaces.SelectItemsConverter" >
+                            <f:selectItems value="#{vendaController.formasDePagamento}" var="pagamento"
+                                           itemLabel="#{pagamento.designacaoForma}" itemValue="#{itens}" />
+                        </p:selectOneRadio>
+                    </p:fieldset>
+
+                    <h:panelGrid columns="1" style="width:100%; margin: 15px auto">
+
+                        <p:outputLabel value="Valor Recebido:" style="font-size: large" />
+                        <p:inputText id="valorLable" style="font-size: 2em" value="#{vendaController.valorRecebido}">
+                            <f:convertNumber  pattern="#,##0.00" />
+                            <p:ajax event="keyup" update="@this, finalizaFrm:concluirBt, finalizaFrm:tpaLable" process="@this" />
+                        </p:inputText>
+
+                        <p:outputLabel value="TPA:" style="font-size: large" />
+                        <p:inputText id="tpaLable" style="font-size: 2em" readonly="true">
+                            <f:convertNumber  pattern="#,##0.00" />
+                        </p:inputText>
+
+                        <p:outputLabel value="Cliente:" style="font-size: large" />
+                        <p:inputText id="clienteLable" style="font-size: 2em" />
+
+                    </h:panelGrid>
+
+                    <p:fieldset legend="Imprimir Recibo">
+                        <p:selectBooleanCheckbox itemLabel="Imprimir Recibo"/>
+                    </p:fieldset>
+
+                    <p:separator style="margin: 15px auto"/>
+
+                    <h:panelGrid columns="2" width="100%">
+                        <p:commandButton value="Fechar" oncomplete="PF('finalizarDialog').hide()" style="height: 3em; background: #FF6A51; color: #ffffff" />
+                        <p:commandButton id="concluirBt" value="Concluir" style="height: 3em; background: #0081c2; color: #ffffff" disabled="#{vendaController.ativarVenda()}"
+                                         oncomplete="PF('trocoDialog').show(), PF('finalizarDialog').hide()" update="tabView,trocoFrm" action="#{vendaController.concluirVenda()}"/>
+                    </h:panelGrid>
+
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="trocoDialog" widgetVar="trocoDialog" header="Troco" modal="true" width="35%" resizable="false">
+                <h:form id="trocoFrm">
+                    <h:panelGrid columns="1" width="100%" style="margin: 20px auto">
+                        <p:outputLabel id="trocoLable2" style="font-size: 3em" value="#{vendaController.troco}"  >
+                            <f:convertNumber  pattern="#,##0.00 KZ" />
+                        </p:outputLabel>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="1" width="100%">
+                        <p:commandButton value="Fechar" oncomplete="PF('trocoDialog').hide()" style="height: 3em; background: #FF6A51; color: #ffffff" 
+                                         update="tabView" />
+                    </h:panelGrid>
+
+                </h:form>
+            </p:dialog>
+
+            <p:dialog id="addProdMesaDialog" widgetVar="addProdMesaDialog" header="Adicionar Produto à Mesa" width="35%" modal="true" resizable="false"
+                      >
+                <h:form>
+
+                    <p:messages id="messages1" showDetail="true" closable="true">
+                        <p:autoUpdate />
+                    </p:messages>
+
+                    <h:panelGrid columns="1" style="text-align: left" width="100%">
+                        <p:outputLabel id="mesaLable" value="Adicionar à Mesa Número: #{vendaController.mesaNumero.numeroMesa}"  style="font-size: 1.5em"  />
+                    </h:panelGrid>
+
+                    <p:separator style="margin: 15px auto"/>
+
+                    <h:panelGrid columns="2" width="100%">
+                        <p:commandButton value="Fechar" oncomplete="PF('addProdMesaDialog').hide()" style="height: 3em; background: #FF6A51; color: #ffffff" />
+                        <p:commandButton id="concluirMesaBt" value="Concluir" style="height: 3em; background: #0081c2; color: #ffffff" disabled="#{vendaController.ativaConcluirAddMesa()}"
+                                         oncomplete="PF('addProdMesaDialog').hide()"  update="tabView:frm,tabView:frm1" action="#{vendaController.adicionarProdutosMesa()}"/>
+                    </h:panelGrid>
+                </h:form>                
+            </p:dialog>
+
+            <h:form>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                    <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                </p:confirmDialog>  
+
+            </h:form>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

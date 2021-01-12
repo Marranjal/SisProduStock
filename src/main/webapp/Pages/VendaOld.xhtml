@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+                template="/WEB-INF/templates/Layout.xhtml">
+
+    <ui:define name="content">
+        <h1 class="aw-page-title">Venda</h1>
+
+        <p:growl id="growl" showDetail="false" life="24000" />  
+
+
+
+        <div class="ui-fluid">
+            <p:tabView id="tabView" >
+                <p:tab title="Venda Directa">
+                    <h:form id="frm">
+                        <h:panelGrid columns="2" columnClasses="ui-grid-col-2,ui-grid-col-8" style="width:50%">
+                            <p:outputLabel value="Cliente" for="@next"/>
+                            <p:inputText/>
+
+                            <p:outputLabel value="Produto" for="@next"/>
+                            <p:inputText id="prod" onfocus="PF('addDialog').show()" value="#{produtoController.novoProduto.designacao}"/>
+
+                            <p:outputLabel value="Quantidade" for="@next"/>
+                            <p:inputText value="#{produtoController.quantidade}"/>
+                        </h:panelGrid>
+
+                        <p:commandButton value="Adicionar" style="width: 20em; height: 3em; background: #0081c2; color: #ffffff;margin-top: 1.5em" icon="fa fa-chevron-circle-left"
+                                         action="#{produtoController.adicionarProduto()}" update="produtoTable, totalGeral, valorExtenso" process="@form"/>
+
+                        <p:dataTable id="produtoTable" var="prodAdd" style="margin-top: 1.5em" value="#{produtoController.listaProdutosAdicionados}" 
+                                     scrollRows="10" scrollable="true" scrollHeight="250">
+
+                            <p:column headerText="descricao">
+                                <h:outputText value="#{prodAdd.produto.designacao}" />
+                            </p:column>
+
+                            <p:column headerText="Quantidade">
+                                <h:outputText  value="#{prodAdd.quantidade}"/>
+                            </p:column>
+
+                            <p:column headerText="Preco">
+                                <h:outputText value="#{prodAdd.produto.preco}"/>
+                            </p:column>
+
+                            <p:column headerText="Total">
+                                <h:outputText  value="#{prodAdd.total}"/>
+                            </p:column>
+                        </p:dataTable>
+
+                        <h:panelGrid columns="2" style="font-size: 3.5em; text-align: right; margin-top: 0.5em" >
+                            <p:outputLabel value="Total:" />
+                            <p:outputLabel id="totalGeral" value="#{produtoController.totalGeral}" >
+                                <f:convertNumber  pattern="#,##0.00 KZ" />
+                            </p:outputLabel>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="1" style="font-size: 1.5em; text-align: right; margin-top: 10px" >
+                            <p:outputLabel id="valorExtenso" value="#{produtoController.valorPorExtenso}" />
+                        </h:panelGrid>
+
+                        <p:separator style="margin-top: 2em"/>
+
+                        <p:toolbar>
+                            <p:toolbarGroup align="right">
+                                <p:commandButton value="Finalizar" style="width: 20em; height: 3em; background: #0081c2; color: #ffffff" icon="fa fa-chevron-circle-left"/>
+                            </p:toolbarGroup>
+
+                            <p:toolbarGroup align="left">
+                                <p:commandButton value="Cancelar" style="width: 20em; height: 3em; background: #FF6A51; color: #ffffff" icon="fa fa-chevron-circle-right" iconPos="right"/>    
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+
+
+                    </h:form>
+                </p:tab>
+
+                <!--Vista de Mesa-->
+                <p:tab title="Vista de Mesas">
+                    <h:form id="frm1">
+                        <p:dataGrid var="mesas" value="#{produtoController.listaDeMesas}" columns="3" layout="grid"
+                                    rows="6" id="mesaGrid">
+
+                            <f:facet name="header">
+                                Venda Por Mesas
+                            </f:facet>
+
+                            <p:panel header="#{mesas.numeroMesa}" style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%">
+                                    <p:graphicImage library="simples" name="images/restIcon.png" /> 
+
+                                    <h:outputText value="#{mesas.conta}" >
+                                        <f:convertNumber  pattern="#,##0.00 KZ" />
+                                    </h:outputText>
+
+                                    <h:panelGrid columns="2" style="width: 100%">
+
+                                        <h:panelGrid columns="1">
+
+                                            <p:commandLink update="mesaDialog" oncomplete="PF('mesaDialog').show()" title="View Detail">
+                                                <i class="fa  fa-fw fa-plus-circle" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{produtoController.mesaSelecionada}" />
+                                            </p:commandLink>
+
+                                        </h:panelGrid>
+
+                                        <h:panelGrid columns="2" style="margin-left: 80%" cellspacing="10px">
+
+                                            <p:commandLink update="mesaDialog" oncomplete="PF('mesaDialog').show()" title="Imprimir Conta">
+                                                <i class="fa  fa-fw fa-print" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{produtoController.mesaSelecionada}" />
+                                            </p:commandLink>
+
+                                            <p:commandLink update="mesaDialog" oncomplete="PF('mesaDialog').show()" title="Finalizar Conta">
+                                                <i class="fa  fa-fw fa-money" ></i>
+                                                <f:setPropertyActionListener value="#{mesas}" target="#{produtoController.mesaSelecionada}" />
+                                            </p:commandLink>
+                                        </h:panelGrid>
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+
+
+            <p:dialog header="Adicionar Produto" id="addDialog" widgetVar="addDialog" width="65%">
+                <h:form>
+                    <p:dataTable var="produto" value="#{produtoController.listaDeProdutos}" >
+
+                        <p:column headerText="descricao">
+                            <h:outputText value="#{produto.designacao}" />
+                        </p:column>
+
+                        <p:column headerText="Preco">
+                            <h:outputText value="#{produto.preco}"/>
+                        </p:column>
+
+                        <p:column style="width:32px;text-align: center">
+                            <p:commandButton icon="ui-icon-circle-plus" update="tabView:frm"  oncomplete="PF('addDialog').hide()" process="@this">
+                                <f:setPropertyActionListener value="#{produto}" target="#{produtoController.novoProduto}"/>
+                            </p:commandButton>
+                        </p:column>
+
+                    </p:dataTable>
+                </h:form>
+            </p:dialog>
+
+
+            <p:dialog header="Adicionar Produto a #{produtoController.mesaSelecionada.numeroMesa}" id="mesaDialog" widgetVar="mesaDialog" modal="true" showEffect="fade" hideEffect="fade"
+                      width="50%">
+                <h:form>
+                    <h:panelGrid columns="2" style="width: 100%">    
+
+                        <h:panelGrid columns="2" columnClasses="ui-grid-col-6,ui-grid-col-6" >
+                            <p:outputLabel value="Produto" for="@next"/>
+                            <p:inputText id="prod1" onfocus="PF('addDialog').show()" value="#{produtoController.novoProduto.designacao}"/>
+
+                            <p:outputLabel value="Quantidade" for="@next"/>
+                            <p:inputText value="#{produtoController.quantidade}"/>
+
+                            <p:outputLabel/>
+                            <p:commandButton value="Adicionar" style="height: 3em; background: #0081c2; color: #ffffff" icon="fa fa-chevron-circle-left"
+                                             action="#{produtoController.adicionarProduto()}" process="@form"/>
+                        </h:panelGrid>
+
+                        <p:dataList value="#{produtoController.listaDeProdutos}" var="order" type="ordered">
+                            <f:facet name="header">
+                                Basic
+                            </f:facet>
+                            #{order.designacao}, #{order.preco}
+                        </p:dataList>
+
+                    </h:panelGrid>
+                    
+                    <p:separator/>
+                    
+                    <h:panelGrid columns="1">
+                        
+                        <p:commandButton value="Fechar" oncomplete="PF('mesaDialog').hide()" icon="fa fa-close"/>
+                        
+                    </h:panelGrid>
+
+                </h:form>
+            </p:dialog>
+        </div>
+
+
+
+    </ui:define>
+
+</ui:composition>
+

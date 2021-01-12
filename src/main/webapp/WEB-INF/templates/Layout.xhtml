@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      >
+
+    <h:head>
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </f:facet>
+
+        <title>SimplesRest System</title>
+
+        <h:outputStylesheet library="simples" name="styles/layout.css"/>
+        <h:outputStylesheet library="simples" name="styles/conteudo.css"/>
+
+        <h:outputScript target="body" library="primefaces" name="jquery/jquery.js" />
+        <ui:insert name="head"/>
+    </h:head>
+
+
+    <body>
+
+        <header class="mt-topbar" >
+            <h:graphicImage library="simples" name="images/logo.png" />
+        </header>
+
+        <div class="mt-horizontal-menu">
+            <ul>
+                <li>
+                    <h:link outcome="home_page" ><i class="fa  fa-fw  fa-th-large"></i>Venda</h:link>
+                </li>
+
+                <li>
+                    <h:link ><i class="fa  fa-fw  fa-search"></i> Cadastros </h:link>
+                </li>
+
+            </ul>
+        </div>
+
+        <section class="mt-content">
+            <ui:insert name="content" />
+        </section>
+
+
+    </body>
+
+
+</html>

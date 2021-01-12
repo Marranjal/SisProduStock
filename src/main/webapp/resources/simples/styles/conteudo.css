@@ -1,0 +1,72 @@
+#contentorPai{
+    width: 100%;
+}
+
+#solicitadoFilho{
+    float: left;
+    width: 58%;
+    height: -webkit-fill-available;
+
+}
+
+#despachadosFilho{
+    width: 38%;
+    height: -webkit-fill-available;
+    float: left;
+    margin-left: 15px;
+}
+@media(min-width: 1290px){
+    #despachadosFilho{
+        width: 40%;
+    }
+
+    #solicitadoFilho{
+        width: 58%;
+    }
+}
+
+@media(min-width: 1024px){
+    #despachadosFilho{
+        width: 40%;
+    }
+
+    #solicitadoFilho{
+        width: 59%;
+    }
+}
+
+.solicitadosTabela{
+    height: 56em;
+    background-color: #CFE6E4;
+}
+
+.tituloCaixa{
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 2.2;
+    font-family: sans-serif;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.solicitados, .despachados{
+    border: 1px solid #dddddd;
+}
+
+.despachadosTabela{
+    height: 53em;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+.rodapeDespachado{
+    height: 40px;
+    background-color: #fff;
+}
+
+.ui-spinner .ui-spinner-input {
+    text-align: -webkit-left;
+    width: 2em;
+}
+
+
