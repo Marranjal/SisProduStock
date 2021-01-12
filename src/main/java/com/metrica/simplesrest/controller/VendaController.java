@@ -431,12 +431,13 @@ public class VendaController implements Serializable {
     }
 
     private void limparContaMesa() {
-
         mesaSelecionada.getMesatempList().forEach(mesa -> mesatempFacade.remove(mesa));
         mesaSelecionada.setContaMesa(0.0);
         mesaFacade.edit(mesaSelecionada);
         desabilitaCheckBox = false;
         tipoVenda = TipoVenda.VENDA_NORMAL;
+           FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, FacesUtil.getMensagemI18n("sucesso"), FacesUtil.getMensagemI18n("produtoAdiconadoAMesa")
+                    + mesaNumero.getNumeroMesa()));
     }
 
     public String testeImpressao() {
